@@ -255,7 +255,7 @@ def solve(grid):
     """
     # 0 - Show the Before puzzle
     before_puzzle = grid_values(grid, show_dot=True)
-    print('BEFORE')
+    print('UNSOLVED')
     display(before_puzzle)
     
     # 1 - Convert to grid
@@ -265,7 +265,7 @@ def solve(grid):
     possibly_solved = search(grid)
     
     # 3 - show results
-    print('\nAFTER')
+    print('\nSOLVED')
     #display(possibly_solved)
 
     return possibly_solved
@@ -280,8 +280,9 @@ if __name__ == '__main__':
     diag_sudoku1 = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     diag_sudoku2 = '8..........36......7..9.2...5...7.......457.....1...3...1....68..85...1..9....4..'
     diag_sudoku3 = '4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......'
+    diag_sudoku4 = "9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9................"
 
-    for sudoku in [diag_sudoku1, diag_sudoku2, diag_sudoku3]:
+    for sudoku in [diag_sudoku1, diag_sudoku4]:
         print('------------------------------- Solving one Sudoku ---------------------- ')
         maybe_solved = solve(sudoku)
         if not maybe_solved:
