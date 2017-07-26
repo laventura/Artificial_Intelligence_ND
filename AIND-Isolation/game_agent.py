@@ -10,6 +10,18 @@ class SearchTimeout(Exception):
     pass
 
 
+def winner_or_loser(game, player):
+    ''' Return winner or loser of the game
+        Boiler plate function called from all heuristics
+    '''
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    return None
+
 def custom_score(game, player):
     """Calculate the heuristic value of a game state from the point of view
     of the given player.
@@ -34,8 +46,8 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+ 
+    return bonus_improved_score(game, player)
 
 
 def custom_score_2(game, player):
@@ -60,8 +72,10 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+
+    #return favor_edges(game, player)  # got max ~68%
+    # return weighted_difference_heuristic(game, player)  # got 64% - 71%
+    return weighted_moves_ratio(game, player)
 
 
 def custom_score_3(game, player):
@@ -86,8 +100,121 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+ 
+    return favor_center_heuristic(game, player)
+
+def custom_score_4(game, player):
+    '''  Additional custom function
+    '''
+    return weighted_difference_heuristic(game, player)
+
+
+def central(game, move):
+    '''  Get distance of move (row,col) from center of the game board
+    '''
+    y, x = move   # row, col;  h, w of the move
+    cw, ch = game.width / 2., game.height / 2. 
+
+    return float( (ch - y)**2 + (cw - x)**2 )
+
+
+def bonus_improved_score(game, player):
+    '''  Improved score - difference from center
+    '''
+    rv = winner_or_loser(game, player)
+    if rv is not None:
+        return rv
+
+    self_moves = len(game.get_legal_moves(player))
+    opponent   = game.get_opponent(player)
+    opp_moves  = len(game.get_legal_moves(opponent))
+
+    self_location = game.get_player_location(player)
+
+    return float( self_moves - opp_moves - central(game, self_location))
+
+def favor_edges_heuristic(game, player):
+    '''  Return +ve coefficient the more the player is towards edges. 
+    '''
+
+    rv = winner_or_loser(game, player)
+    if rv is not None:
+        return rv
+
+    opponent     = game.get_opponent(player)
+    center       = game.width / 2.
+
+    own_location = game.get_player_location(player)
+    opp_location = game.get_player_location(opponent)
+
+    own_delta_x  = abs(center - own_location[0])
+    own_delta_y  = abs(center - own_location[1])
+
+    opp_delta_x  = abs(center - opp_location[0])
+    opp_delta_y  = abs(center - opp_location[1])
+
+    own_moves    = len(game.get_legal_moves(player))
+    opp_moves    = len(game.get_legal_moves(opponent))
+
+    return float(5 * (own_moves - opp_moves) + 
+                (own_delta_x + own_delta_y) - (opp_delta_x + opp_delta_y))
+
+def favor_center_heuristic(game, player):
+    ''' Return -ve coefficient the more the player is towards center
+    '''
+
+    rv = winner_or_loser(game, player)
+    if rv is not None:
+        return rv
+
+    opponent     = game.get_opponent(player)
+    center       = game.width / 2.
+
+    own_location = game.get_player_location(player)
+    opp_location = game.get_player_location(opponent)
+
+    own_delta_x  = abs(center - own_location[0])
+    own_delta_y  = abs(center - own_location[1])
+
+    opp_delta_x  = abs(center - opp_location[0])
+    opp_delta_y  = abs(center - opp_location[1])
+
+    own_moves    = len(game.get_legal_moves(player))
+    opp_moves    = len(game.get_legal_moves(opponent))
+
+    return float(5 * (own_moves - opp_moves) - 
+                (own_delta_x + own_delta_y) + (opp_delta_x + opp_delta_y))
+
+def weighted_difference_heuristic(game, player):
+    ''' Return a difference b/w Self Moves^2 - Opponent Moves^2, weighted by 1.5
+    '''
+    rv = winner_or_loser(game, player)
+    if rv is not None:
+        return rv
+
+    opponent     = game.get_opponent(player)
+
+    own_moves    = len(game.get_legal_moves(player))
+    opp_moves    = len(game.get_legal_moves(opponent))
+
+    return float( 1.5 * own_moves ** 2 -   opp_moves ** 2)
+
+def weighted_moves_ratio(game, player):
+    '''  Ratio of Own Moves / Opponent Moves
+    '''
+    rv = winner_or_loser(game, player)
+    if rv is not None:
+        return rv
+
+    opponent     = game.get_opponent(player)
+
+    own_moves    = len(game.get_legal_moves(player))
+    opp_moves    = len(game.get_legal_moves(opponent))
+
+    if own_moves == 0: return float('-inf')
+    if opp_moves == 0: return float('inf')
+
+    return float(1.5 * own_moves / opp_moves)
 
 
 class IsolationPlayer:
@@ -230,11 +357,16 @@ class MinimaxPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         legal_moves = game.get_legal_moves() 
+        
+        best_move = (-1 , -1)
+        if legal_moves is not None and len(legal_moves) > 0:
+            best_move = legal_moves[0]
 
-        if depth == 0:
-            return (game.get_player_location(self), self.score(game, self))
+        if depth == 0:  # or not legal_moves:
+            return ( best_move, self.score(game, self) )
 
-        optimal_func, best_move =  None, (-1, -1)
+        optimal_func =  None
+        
 
         # 0 - find who is active player
         if self.active_player(game):   # i.e. WE are the active player --> MAXimize the score
@@ -249,7 +381,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         for move in legal_moves:
             next_state = game.forecast_move(move)
-            _, score = self._minimax_move(next_state, depth-1)  # get the score
+            _, score = self._minimax_move(next_state, depth-1)  # recurse - for next game state
             if optimal_func(best_result, score) == score:
                 best_move, best_result = move, score
                     
@@ -294,15 +426,24 @@ class AlphaBetaPlayer(IsolationPlayer):
         """
         self.time_left = time_left
 
-        MAX_DEEP = 10000   # max number of iterations to search for
-        move = (-1, -1)
-        ## Iterative Deepening... with AlphaBeta Pruning
-        for i in range(MAX_DEEP):
-            try:
-                move = self.alphabeta(game, i)
-            except SearchTimeout:
-                break
-        return move
+        best_move = (-1, -1)
+        legal_moves = game.get_legal_moves()
+        if legal_moves is not None and len(legal_moves) > 0:
+            best_move = legal_moves[0]
+        
+        depth = 1 
+
+        try:
+            new_move = best_move 
+            while True:
+                new_move = self.alphabeta(game, depth)
+                best_move = new_move
+                depth += 1
+
+        except SearchTimeout:
+            pass
+        
+        return best_move
 
     def active_player(self, game):
         ''' Return True if self == game
@@ -357,22 +498,109 @@ class AlphaBetaPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
+        # ## Run the recursive alphabeta
         (move, score) = self._alphabeta_recursive(game, depth, alpha, beta, self.active_player(game))
+        
         return move
+        
+        # return self._test_alphabeta(game, depth, alpha, beta)   ## Didnt work that great
 
+    
+    def _test_alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf") ):
+        '''  ALTERNATE AlphaBeta -- to reduce forfeits. 
+            Uses self.min_value() and self.max_value()
+        '''
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        best_move = (-1, -1)
+        best_value = float('-inf')
+
+        legal_moves = game.get_legal_moves()
+
+        for move in legal_moves:
+            # get new value for new state of game
+            new_value = max(best_value, self.min_value(game.forecast_move(move), depth-1, alpha, beta ))
+            if new_value > best_value:
+                best_value = new_value
+                best_move  = move 
+
+            if best_value >= beta:
+                return best_move
+            alpha = max(alpha, best_value)
+        
+        return best_move
+
+    def min_value(self, game, depth, alpha, beta):
+        ''' Return MIN
+        '''
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        min_value = float('inf')
+
+        legal_moves = game.get_legal_moves()
+        # return current state of game
+        if depth == 0 or not legal_moves:
+            return self.score(game, self)
+
+        for move in legal_moves:
+            min_value = min(min_value, self.max_value(game.forecast_move(move), depth-1, alpha, beta))
+            # check
+            if min_value <= alpha:
+                return min_value
+            # update beta
+            beta = min(beta, min_value)
+
+        return min_value
+
+    def max_value(self, game, depth, alpha, beta):
+        '''  Return MAX
+        '''
+
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        max_value = float('-inf')
+
+        legal_moves = game.get_legal_moves()
+        # return current state of game
+        if depth == 0 or not legal_moves:
+            return self.score(game, self)    # current utility of the game
+
+        for move in legal_moves:
+            max_value = max(max_value, self.min_value(game.forecast_move(move), depth-1, alpha, beta))
+
+            # check
+            if max_value >= beta:
+                return max_value
+
+            # update alpha
+            alpha = max(alpha, max_value)
+
+        return max_value
+    
     def _alphabeta_recursive(self, game, depth, alpha=float("-inf"), beta=float("inf"), maximizing=True):
-        '''  Implements Depth-limited AlphaBeta recursively
+        '''  Main implementation of  Depth-limited AlphaBeta recursively
              Returns (move, value) tuple for every depth
+
+             This now completely eliminates forfeits
+
         ''' 
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
         legal_moves = game.get_legal_moves()
+        # best_move   = legal_moves[0] if legal_moves is not None else (-1, -1)
 
-        if not legal_moves or depth <= 0:
-            return (-1, -1), self.score(game, self)
+        best_move = (-1, -1)
+        if legal_moves is not None and len(legal_moves) > 0:
+            best_move = legal_moves[0]
 
-        best_move = None
+        if depth <= 0:
+            return best_move, self.score(game, self)
+
+        # best_move = None
         if maximizing:      # Maximize for Self
             best_value = float("-inf")
             for move in legal_moves:
