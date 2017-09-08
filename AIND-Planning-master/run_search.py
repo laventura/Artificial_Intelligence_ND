@@ -102,7 +102,7 @@ def main(p_choices, s_choices):
 
 
 def show_solution(node, elapsed_time):
-    print("Plan length: {}  Time elapsed in seconds: {}".format(len(node.solution()), elapsed_time))
+    print("Plan length: {}  Time elapsed in seconds: {:.5f}".format(len(node.solution()), elapsed_time))
     for action in node.solution():
         print("{}{}".format(action.name, action.args))
 
