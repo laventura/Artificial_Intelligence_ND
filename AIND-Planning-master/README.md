@@ -12,13 +12,13 @@ Instead, you will implement domain-independent heuristics.
 - Part 1 - Planning problems:
 	- READ: applicable portions of the Russel/Norvig AIMA text
 	- GIVEN: problems defined in classical PDDL (Planning Domain Definition Language)
-	- TODO: Implement the Python methods and functions as marked in `my_air_cargo_problems.py`
-	- TODO: Experiment and document metrics
+	- [x] TODO: Implement the Python methods and functions as marked in `my_air_cargo_problems.py`
+	- [x] TODO: Experiment and document metrics
 - Part 2 - Domain-independent heuristics:
 	- READ: applicable portions of the Russel/Norvig AIMA text
-	- TODO: Implement relaxed problem heuristic in `my_air_cargo_problems.py`
-	- TODO: Implement Planning Graph and automatic heuristic in `my_planning_graph.py`
-	- TODO: Experiment and document metrics
+	- [x] TODO: Implement relaxed problem heuristic in `my_air_cargo_problems.py`
+	- [x] TODO: Implement Planning Graph and automatic heuristic in `my_planning_graph.py`
+	- [x] TODO: Experiment and document metrics
 - Part 3 - Written Analysis
 
 ## Environment requirements
@@ -81,11 +81,11 @@ Goal(At(C1, JFK) ∧ At(C3, JFK) ∧ At(C2, SFO) ∧ At(C4, SFO))
 ```
 
 #### TODO: Implement methods and functions in `my_air_cargo_problems.py`
-- `AirCargoProblem.get_actions` method including `load_actions` and `unload_actions` sub-functions
-- `AirCargoProblem.actions` method
-- `AirCargoProblem.result` method
-- `air_cargo_p2` function
-- `air_cargo_p3` function
+- [x] `AirCargoProblem.get_actions` method including `load_actions` and `unload_actions` sub-functions
+- [x] `AirCargoProblem.actions` method
+- [x] `AirCargoProblem.result` method
+- [x] `air_cargo_p2` function
+- [x] `air_cargo_p3` function
 
 #### TODO: Experiment and document metrics for non-heuristic planning solution searches
 * Run uninformed planning searches for `air_cargo_p1`, `air_cargo_p2`, and `air_cargo_p3`; provide metrics on number of node expansions required, number of goal tests, time elapsed, and optimality of solution for each search algorithm. Include the result of at least three of these searches, including breadth-first and depth-first, in your write-up (`breadth_first_search` and `depth_first_graph_search`). 
@@ -122,17 +122,17 @@ classes, and the search methods in the AIMA library.
 - *Planning Graph*
 
 #### TODO: Implement heuristic method in `my_air_cargo_problems.py`
-- `AirCargoProblem.h_ignore_preconditions` method
+- [x] `AirCargoProblem.h_ignore_preconditions` method
 
 #### TODO: Implement a Planning Graph with automatic heuristics in `my_planning_graph.py`
-- `PlanningGraph.add_action_level` method
-- `PlanningGraph.add_literal_level` method
-- `PlanningGraph.inconsistent_effects_mutex` method
-- `PlanningGraph.interference_mutex` method
-- `PlanningGraph.competing_needs_mutex` method
-- `PlanningGraph.negation_mutex` method
-- `PlanningGraph.inconsistent_support_mutex` method
-- `PlanningGraph.h_levelsum` method
+- [x] `PlanningGraph.add_action_level` method
+- [x] `PlanningGraph.add_literal_level` method
+- [x] `PlanningGraph.inconsistent_effects_mutex` method
+- [x] `PlanningGraph.interference_mutex` method
+- [x] `PlanningGraph.competing_needs_mutex` method
+- [x] `PlanningGraph.negation_mutex` method
+- [x] `PlanningGraph.inconsistent_support_mutex` method
+- [x] `PlanningGraph.h_levelsum` method
 
 
 #### TODO: Experiment and document: metrics of A* searches with these heuristics
