@@ -219,10 +219,14 @@ class AirCargoProblem(Problem):
         executed.
         """
         # TODO implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
-        ## return difference between set(goals) and set(node state)
-        goals   = set(self.goal)
-        actions = set(decode_state(node.state, self.state_map).pos)
-        return len(goals - actions)
+        ## modified per review comments
+        counter = 0
+        kb = PropKB()
+        kb.tell(decode_state(node.state, self.state_map).pos_sentence())
+        for aClause in self.goal:
+            if aClause not in kb.clauses:
+                counter += 1
+        return counter
 
 
 def air_cargo_p1() -> AirCargoProblem:
