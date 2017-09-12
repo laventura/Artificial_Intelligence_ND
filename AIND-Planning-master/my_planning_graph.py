@@ -531,22 +531,33 @@ class PlanningGraph():
         :return: int
         """
         level_sum = 0
-        # TODO implement
-        for g in self.problem.goal:
-            level_sum += self.level_cost(g)
+        # # TODO implement
+        # for g in self.problem.goal:
+        #     level_sum += self.level_cost(g)
+        visitedStates = set()
+
+        for goal in self.problem.goal:
+            l_index = -1 
+            for levelStates in self.s_levels:
+                l_index += 1
+                for state in levelStates:
+                    if goal == state.symbol and state not in visitedStates:
+                        level_sum += l_index
+                        visitedStates.add(state)
+                        break
         
         #print('level sum:', level_sum)
-        return level_sum
+        return level_sum-1
 
     def level_cost(self, goal):
         ''' Determine level cost for a specific goal
         '''
-        cost = 0
-        for level in self.s_levels:
-            cost += 1
-            for sNode in level:
-                if sNode.symbol == goal:
-                    return cost
+        cost = -1
+        for level_num, s_node_set in enumerate(self.s_levels):
+            level_literal_set = set(expr(n.symbol) for n in s_node_set)
+            #cost += 1
+            if goal in level_literal_set:
+                return level_num
 
         return 0 # none found
 
