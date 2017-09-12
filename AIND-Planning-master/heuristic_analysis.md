@@ -38,7 +38,7 @@ No. | Algorithm | Expansions | Goal Tests | New Nodes | Steps | Time (s)
 7 | **G-BFGS** | 7 | 9 | 28 | 6 | **0.007**
 8 | A* h1 | 55 | 57 | 224 | 6 | 0.06
 9 | A* hIgnore | 41 | 43 | 170 | 6 | 0.039
-10 | A* hLevelsum| 55 | 57 | 224 | 6 | 2.16
+10 | A* hLevelsum| 45 | 47 | 188 | 6 | 2.37
 
 The fastest performance is with the **Greedy Best First Graph Search with h1 heuristic** algorithm. This expands the fewest number of nodes (7) and fewest goal tests (9) and, as a result, has the lowest execution time (0.007 seconds). This is because the G-BFGS expands the node closest to the goal (assuming that it will lead to the quickest search). It evaluates nodes using the nodes using just the heuristic function, i.e. `f(n) = h(n)`
 
@@ -83,7 +83,7 @@ No. | Algorithm | Expansions | Goal Tests | New Nodes | Steps | Time (s)
 7 | **G-BFGS** | 998 | 1000  | 8982 | 21 |**3.786**
 8 | A* h1 | 4853 | 4855 | 44041 | 9 | 18.463
 9 | A* hIgnore | 1450 | 1452 | 13303 | 9 | 5.586
-10 | A* hLevelsum| 4853 | 4855 | 44041 | 9 | 3565.64385 
+10 | A* hLevelsum| - | - | - | - | Timedout 
 
 In this problem as well, the **Greedy Best-First Graph Search with h1 heuristic** performs best, timing at 3.786 seconds; however, it does _not find the optimal solution!_ The optimal solution of 9 steps is found by **Breadth First Search** or **A-star with ignoring pre-conditions heuristic**, though both of them take just a little bit longer than G-BFGS.  BFS eventually finds its goal at a finite depth d, but takes longer; however it runs into space/memory constraints if d is large. A* with ignore heuristic performs better, finding the optimal solution in 9 step, with far fewer node expansions than BFS. One would prefer this A* with ignore heuristic over other algorithms as it finds optimal solution.
 
