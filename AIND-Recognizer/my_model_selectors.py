@@ -69,6 +69,25 @@ class SelectorBIC(ModelSelector):
 
     http://www2.imm.dtu.dk/courses/02433/doc/ch6_slides.pdf
     Bayesian information criteria: BIC = -2 * logL + p * logN
+    
+    BIC maximizes the likelihood of data, and penalizes complex models
+    - avoids cross validation by using a penalty term
+    - scores model topologies by balancing fit / complexity in training set for each word
+
+    BIC = -2 * logL  + p * logN
+    where:
+    - logL = log likelihood of fitted model
+    - p = number of free params in model (i.e. measure of model complexity)
+    - N = number of data points 
+
+    Lower the BIC score, better is the model. The first term (-2 * LogL) decreases with higher p; 
+    the second term (p * logN) increases with higher p. 
+
+    Algo: 
+    - loop thru min_components, max_components
+    - find model with lowest BIC score
+
+ 
     """
 
     def select(self):
@@ -97,7 +116,9 @@ class SelectorBIC(ModelSelector):
                 if score < best_score:
                     best_score, best_model = score, model
 
-            except:
+            except:  # ValueError as v:
+                # print("SelectorBic: ", v)
+                # score = float('inf')
                 pass
 
         return best_model
@@ -111,7 +132,21 @@ class SelectorDIC(ModelSelector):
     Document Analysis and Recognition, 2003. Proceedings. Seventh International Conference on. IEEE, 2003.
     http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.58.6208&rep=rep1&type=pdf
     https://pdfs.semanticscholar.org/ed3d/7c4a5f607201f3848d4c02dd9ba17c791fc2.pdf
+
     DIC = log(P(X(i)) - 1/(M-1)SUM(log(P(X(all but i))
+
+    DIC tries to find the number of components where the difference is largest. 
+    DIC attempts to find a model that has high likelihood (small -ve number) for the original word,
+    and low likelihood (large -ve number) to all other words, thus discriminating the original word.abs
+
+    To run DIC and find an optimal model, we run a model on every word, and compare scores against all other words.abs
+
+    DIC = log(P(X(i)) - 1/(M-1) * sum(log(P(X(all but i))))
+        = log likelihood of data belonging to model - avg of anti log likehood of data X and model M
+        = log(P(original word)) - average(log(P(all_other_words)))
+
+    Higher the DIC score, better is the model
+
     '''
 
     def select(self):
@@ -132,7 +167,10 @@ class SelectorDIC(ModelSelector):
                 # find highest score
                 if score > best_score:
                     best_score, best_model = score, model
-            except:
+
+            except: # ValueError as v:
+                # print("SelectorDIC: ", v)
+                # score = float('-inf')
                 pass
 
         return best_model
@@ -142,36 +180,59 @@ class SelectorDIC(ModelSelector):
 class SelectorCV(ModelSelector):
     ''' select best model based on average log Likelihood of cross-validation folds
 
+    SelectorCV uses cross-validation to find optimal models. 
+    It uses K-folds to fold dataset, rotating one left out fold for validation, which is considered 
+    proxy for unseen data.
+
+    Higher the CV score, better is the model. 
+
+    Algo:
+    - loop thru min_components to max_components
+    - score each model
+    - select the best model that has highest score on avg loglikelihood on the folds
+
     '''
 
     def select(self):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-        # TODO implement model selection using CV
-        best_model  = self.base_model(self.min_n_components)
-        best_score  = float('-inf')
+        kfold = KFold(n_splits=3)
+        log_likelihoods = []
+        scores_models = []
 
-        for m in range(self.min_n_components, self.max_n_components + 1):
+        for components in range(self.min_n_components, self.max_n_components + 1):
             try:
-                model   = self.base_model(m)
-                kfold   = KFold()
-                scores  = []
-                # get indices for Train / Test
-                for ix_train, ix_test in kfold.split(self.sequences):
-                    X_train, len_train = combine_sequences(ix_train, self.sequences)
-                    X_test,  len_test  = combine_sequences(ix_test, self.sequences)
-                    # fit model
-                    model.fit(X_train, len_train)
-                    # get score 
-                    scores.append(model.score(X_test, len_test))
-                
-                # calc mean across all scores
-                mean_score = statistics.mean(scores)
+                # see if enough data to split using KFold
+                if len(self.sequences) > 2:
+                    # CV loop: get train/test indices
+                    for ix_train, ix_test in kfold.split(self.sequences):
+                        # training sequence
+                        self.X, self.lengths = combine_sequences(ix_train, self.sequences)
+                        # test sequence
+                        X_test, len_test = combine_sequences(ix_test, self.sequences)
 
-                if mean_score > best_score:
-                    best_score, best_model = mean_score, best_model
+                        hmm_model = self.base_model(components)
+                        log_likelihood = hmm_model.score(X_test, len_test)
                 
-            except:
-                pass 
+                else:
+                    # not enough data to split
+                    hmm_model = self.base_model(components)
+                    log_likelihood = hmm_model.score(self.X, self.lengths)
 
-        return best_model
+                log_likelihoods.append(log_likelihood)
+
+                # get avg logL
+                mean_score = np.mean(log_likelihoods)
+                scores_models.append(tuple([mean_score, hmm_model]))
+
+            except Exception as e:
+                # print("SelectorCV: exc: ", e)
+                pass
+        
+        # return hmm model corresponding to the max score
+        if scores_models:
+            maxx = max(scores_models, key = lambda x: x[0])
+            return maxx[1]  # the hmm model corresponding to the max score
+        else:
+            return None
+
