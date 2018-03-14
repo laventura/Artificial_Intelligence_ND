@@ -1,0 +1,8 @@
+*.h5
+*.hdf5
+__pycache__
+test-video-cam.ipynb
+test-video.py
+*.swp
+data/*.csv
+data/*.zip
