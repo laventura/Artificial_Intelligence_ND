@@ -11,9 +11,13 @@ The following projects are included:
 
 > Uses classic _constraint propagation_ strategies to solve Sudoku.
 
+<img  src="images/sudoku.png" width=200 height=400 />
+
 2. [Build a Game-Playing Agent](AIND-Isolation/)
 
 > Uses _adversarial search agent_ to play a game called "Isolation", a deterministic, two-player game in which players alternate turns to move a piece from one to another. Implements classic **search algorithms** such as _MiniMax_, _Alpha Beta Search_, _Iterative Deepening Search_, and _Heuristic Search_ algorithms to show different plays.
+
+<img src="images/chess-vis.gif" />
 
 3. [Implement a Planning Search](AIND-Planning-master/)
 
@@ -23,6 +27,8 @@ The following projects are included:
 
 > This project implements _probabilistic models_ such as **Hidden Markov Models (HMM)** to implement a sign-language recognizer.
 
+<img src="images/statespace.png" height=250 width=500 />
+
 ## Deep Learning Projects
 
 The following projects implement deep neural networks that use computer vision to solve challenging real-world tasks, such as image classification, time series prediction, sequence modeling, and a final capstone project for facial keypoints detection.
@@ -31,12 +37,20 @@ The following projects implement deep neural networks that use computer vision t
 
 > This project uses **convolutional neural networks (CNN)** with _transfer learning_ from pre-trained networks (such as _VGG_, _Inception_, _ResNet_) to real world tasks such as classifying images. In this case, it is used to classify dog pictures from among ~130 dog-breeds, a task challenging enough for humans. 
 
+<img src="images/dog_breeds.png" width=600 height=500 />
+
+Sample CNN
+
+<img src="images/sample_cnn.png" width=300 height=200 />
+
 > We use latest deep learning frameworks such as **Keras**(http://keras.io) and **TensorFlow** to create build a CNN architecture from pre-trained models _VGG_, _Inception_, etc. The pre-trained models significantly reduce the challenges in training a new classifier. We experiment with various architectures, and achieve over **82% accuracy** 👍
 
 6. [Time Series Prediction and Text Generation](aind2-rnn/)
 
 > In this project, we perform **sequence modeling** using **Recurrent Neural Networks (RNN) and LSTM**. We use RNNs to predict stock prices (a rather dicey, but interesting problem). We also use LSTMs to achieve **text generation** using a *char-rnn* style generator that learns to generate text character by character. We use this to generate fake _Sherlock Holmes_ style stories. 😀
 We use **Keras** to implement the projects. 
+
+<img src="images/aapl_stock_prediction.png" />
 
 7. [Computer Vision Capstone Project: Facial Keypoint Detection](FacialKeypoints-AIND/)
 
@@ -46,3 +60,4 @@ We use **Keras** to implement the projects.
 
 > Project is implemented in _Keras_ and uses _CNN_ to identify features, and regressors to add facial keypoints. More image processing is performed using OpenCV.
 
+<img src="images/obamas_with_shades.png" />
