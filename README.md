@@ -31,7 +31,18 @@ The following projects implement deep neural networks that use computer vision t
 
 > This project uses **convolutional neural networks (CNN)** with _transfer learning_ from pre-trained networks (such as _VGG_, _Inception_, _ResNet_) to real world tasks such as classifying images. In this case, it is used to classify dog pictures from among ~130 dog-breeds, a task challenging enough for humans. 
 
-6. [Time Series Prediction and Text Generation]
+> We use latest deep learning frameworks such as **Keras**(http://keras.io) and **TensorFlow** to create build a CNN architecture from pre-trained models _VGG_, _Inception_, etc. The pre-trained models significantly reduce the challenges in training a new classifier. We experiment with various architectures, and achieve over **82% accuracy** 👍
 
-7. [Computer Vision Capstone Project: Facial Keypoint Detection]
+6. [Time Series Prediction and Text Generation](aind2-rnn/)
+
+> In this project, we perform **sequence modeling** using **Recurrent Neural Networks (RNN) and LSTM**. We use RNNs to predict stock prices (a rather dicey, but interesting problem). We also use LSTMs to achieve **text generation** using a *char-rnn* style generator that learns to generate text character by character. We use this to generate fake _Sherlock Holmes_ style stories. 😀
+We use **Keras** to implement the projects. 
+
+7. [Computer Vision Capstone Project: Facial Keypoint Detection](FacialKeypoints-AIND/)
+
+> In the final project, we use advanced _computer vision_ techniques to detect faces in images using filters, and generate facial keypoints.
+
+> We implement a full computer vision pipeline to perform _image pre-processing_ (e.g. transforming color spaces, image de-noising, image blurring, identifying regions of interest, etc.) and _filtering_ to extract portions of images. Then we use _Haar cascades_ to detect faces. We then implement CNNs to identify facial landmarks, and then perform interesting operations on detected faces. 😎
+
+> Project is implemented in _Keras_ and uses _CNN_ to identify features, and regressors to add facial keypoints. More image processing is performed using OpenCV.
 
